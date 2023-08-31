@@ -12,7 +12,7 @@ public interface AccountTransactionServices {
     public List<AccountTransactionDto> getAllTransactions();
     public List<AccountTransactionDto> getUserAllTransactions(Long id);
 
-    public AccountTransactionDto createTransaction(AccountTransactionDto transactionDto);
+    public AccountTransactionDto createTransaction(AccountTransactionDto transactionDto) throws Exception;
     public ResponseEntity<AccountTransactionDto> getTransactionById(Long id);
 
     public AccountTransactionDto entityToDto(AccountTransactionEntity user);

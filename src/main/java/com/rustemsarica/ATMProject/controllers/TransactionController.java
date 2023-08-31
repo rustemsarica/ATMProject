@@ -25,14 +25,20 @@ public class TransactionController {
     UserRepository userRepository;
 
     @GetMapping("/all")
-    public ResponseEntity< List<AccountTransactionDto>> getAllTransactions(){
+    public ResponseEntity<List<AccountTransactionDto>> getAllTransactions(){
         return ResponseEntity.ok(accountTransactionServices.getAllTransactions());
     }
 
     @GetMapping
-    public void createTransaction(){
-        AccountTransactionDto accountTransactionDto = AccountTransactionDto.builder().user(userRepository.findById(1L).get()).amount(100F).type(TransactionType.DEPOSIT).build(); 
-
-        accountTransactionServices.createTransaction(accountTransactionDto);
+    public ResponseEntity<?> createTransaction(){
+        //  AccountTransactionDto accountTransactionDto = AccountTransactionDto.builder().user(userRepository.findById(1L).get()).amount(50F).type(TransactionType.TRANSFER).receiver(userRepository.findById(2L).get()).build(); 
+        AccountTransactionDto accountTransactionDto = AccountTransactionDto.builder().user(userRepository.findById(1L).get()).amount(50F).type(TransactionType.DEPOSIT).build(); 
+        // AccountTransactionDto accountTransactionDto = AccountTransactionDto.builder().user(userRepository.findById(1L).get()).amount(50F).type(TransactionType.WITHDRAW).build();
+        try {
+            AccountTransactionDto accountTransactionDto2 = accountTransactionServices.createTransaction(accountTransactionDto);
+            return ResponseEntity.ok(accountTransactionDto2);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

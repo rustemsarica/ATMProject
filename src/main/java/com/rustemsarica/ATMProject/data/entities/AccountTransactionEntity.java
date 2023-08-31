@@ -3,7 +3,6 @@ package com.rustemsarica.ATMProject.data.entities;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rustemsarica.ATMProject.data.entities.utils.TransactionType;
 
 import jakarta.persistence.Entity;
@@ -18,16 +17,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "account_transactions")
-public class AccountTransactionEntity extends BaseEntity {
+public class AccountTransactionEntity extends BaseEntity{
 
     private TransactionType type;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="user_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
     private UserEntity user;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="receiver", nullable = true)
+    private UserEntity receiver;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="sender", nullable = true)
+    private UserEntity sender;
+    
     private float amount;
 
     public TransactionType getType() {
@@ -54,6 +60,20 @@ public class AccountTransactionEntity extends BaseEntity {
         this.amount = amount;
     }
 
-    
+    public UserEntity getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(UserEntity receiver) {
+        this.receiver = receiver;
+    }
+
+    public UserEntity getSender() {
+        return sender;
+    }
+
+    public void setSender(UserEntity sender) {
+        this.sender = sender;
+    }
 
 }

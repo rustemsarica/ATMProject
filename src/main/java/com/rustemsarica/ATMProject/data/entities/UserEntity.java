@@ -1,7 +1,5 @@
 package com.rustemsarica.ATMProject.data.entities;
 
-
-import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -11,6 +9,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -18,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
-public class UserEntity extends BaseEntity implements Serializable{
+public class UserEntity extends BaseEntity{
     
     @JsonIgnore
     private UserRole role = UserRole.ROLE_USER;
@@ -28,15 +27,20 @@ public class UserEntity extends BaseEntity implements Serializable{
     @Column(unique = true)
     private String username;
 
+    @JsonIgnore
     private String password;
 
+    @Min(value = 0, message = "Your money not enaugh")
     private float balance = 0.00F;
 
+    @JsonIgnore
     private int failedLoginAttempts = 0;
 
+    @JsonIgnore
     private boolean accountNonLocked = true;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<AccountTransactionEntity> accountTransactionEntities;
 
 

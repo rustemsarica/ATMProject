@@ -12,6 +12,7 @@ import com.rustemsarica.ATMProject.business.dto.AccountTransactionDto;
 import com.rustemsarica.ATMProject.business.services.AccountTransactionServices;
 import com.rustemsarica.ATMProject.data.entities.AccountTransactionEntity;
 import com.rustemsarica.ATMProject.data.entities.UserEntity;
+import com.rustemsarica.ATMProject.data.entities.utils.TransactionType;
 import com.rustemsarica.ATMProject.data.repositories.AccountTransactionRepository;
 import com.rustemsarica.ATMProject.data.repositories.UserRepository;
 
@@ -50,22 +51,17 @@ public class AccountTransactionServicesImpl implements AccountTransactionService
     }
 
     @Override
-    public AccountTransactionDto createTransaction(AccountTransactionDto transactionDto) {
-        AccountTransactionEntity accountTransactionEntity = dtoToEntity(transactionDto);
-        accountTransactionRepository.save(accountTransactionEntity);
-        
-        UserEntity userEntity = transactionDto.getUser();
-
+    public AccountTransactionDto createTransaction(AccountTransactionDto transactionDto) throws Exception {
+                
         switch (transactionDto.getType()){
             case WITHDRAW:
-                userEntity.removeBalance(transactionDto.getAmount());
-                userRepository.save(userEntity);
+                withdraw(transactionDto);
             break;
             case DEPOSIT:
-                userEntity.addBalance(transactionDto.getAmount());
-                userRepository.save(userEntity);                
+                deposit(transactionDto);             
             break;
-            case TRANSFER:
+            case TRANSFER:                
+                transfer(transactionDto);
             break;
         }
         return transactionDto;
@@ -87,6 +83,53 @@ public class AccountTransactionServicesImpl implements AccountTransactionService
     public AccountTransactionEntity dtoToEntity(AccountTransactionDto dto) {
         AccountTransactionEntity accountTransactionEntity = modelMapper.map(dto, AccountTransactionEntity.class);
         return accountTransactionEntity;
+    }
+
+    private void withdraw(AccountTransactionDto transactionDto) throws Exception{
+        AccountTransactionEntity accountTransactionEntity = dtoToEntity(transactionDto);
+        accountTransactionRepository.save(accountTransactionEntity);
+
+        UserEntity userEntity = transactionDto.getUser();
+        if(userEntity.getBalance() >= transactionDto.getAmount()){
+            userEntity.removeBalance(transactionDto.getAmount());
+            userRepository.save(userEntity);
+        }else{
+            throw new Exception("Not enough balance");
+        }
+    }
+
+    private void deposit(AccountTransactionDto transactionDto) throws Exception{
+        AccountTransactionEntity accountTransactionEntity = dtoToEntity(transactionDto);
+        accountTransactionRepository.save(accountTransactionEntity);
+
+        UserEntity userEntity = transactionDto.getUser();
+        userEntity.addBalance(transactionDto.getAmount());
+        userRepository.save(userEntity);
+    }
+
+    private void transfer(AccountTransactionDto transactionDto) throws Exception{        
+        
+        UserEntity userEntity = transactionDto.getUser();
+        if(userEntity.getBalance() >= transactionDto.getAmount()){
+            AccountTransactionDto sender = AccountTransactionDto.builder()
+                                                                    .user(transactionDto.getUser())
+                                                                    .receiver(transactionDto.getReceiver())
+                                                                    .amount(transactionDto.getAmount())
+                                                                    .type(TransactionType.WITHDRAW)
+                                                                    .build();
+            withdraw(sender);
+
+            AccountTransactionDto receiver = AccountTransactionDto.builder()
+                                                                    .user(transactionDto.getReceiver())
+                                                                    .amount(transactionDto.getAmount())
+                                                                    .type(TransactionType.DEPOSIT)
+                                                                    .sender(transactionDto.getUser())
+                                                                    .build();
+            deposit(receiver);            
+        }else{
+            throw new Exception("Not enough balance");
+        }
+        
     }
     
 }
