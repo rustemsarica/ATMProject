@@ -1,5 +1,9 @@
 package com.rustemsarica.ATMProject.data.entities;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rustemsarica.ATMProject.data.entities.utils.TransactionType;
 
 import jakarta.persistence.Entity;
@@ -18,8 +22,10 @@ public class AccountTransactionEntity extends BaseEntity {
 
     private TransactionType type;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
     private UserEntity user;
 
     private float amount;

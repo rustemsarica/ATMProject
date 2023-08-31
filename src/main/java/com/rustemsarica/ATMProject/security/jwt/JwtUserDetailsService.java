@@ -1,8 +1,11 @@
 package com.rustemsarica.ATMProject.security.jwt;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,10 +30,12 @@ public class JwtUserDetailsService implements UserDetailsService{
         UserEntity user = (UserEntity) userRepository.findByUsername(username).get();
 
         if (user == null) {
-            throw new UsernameNotFoundException("Böyle bir kullanıcı yoktur " + username);
+            throw new UsernameNotFoundException("User not found");
         }
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(user.getRole().toString())); 
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
-                new ArrayList<>());
+                authorities);
     }
 
     public UserEntity save(jwtRegisterRequest user) throws Exception{

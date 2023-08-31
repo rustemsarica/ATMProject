@@ -2,9 +2,14 @@ package com.rustemsarica.ATMProject.data.entities;
 
 
 import java.io.Serializable;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.rustemsarica.ATMProject.data.entities.utils.UserRole;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -15,6 +20,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 public class UserEntity extends BaseEntity implements Serializable{
     
+    @JsonIgnore
+    private UserRole role = UserRole.ROLE_USER;
+
     private String name;
 
     @Column(unique = true)
@@ -27,6 +35,10 @@ public class UserEntity extends BaseEntity implements Serializable{
     private int failedLoginAttempts = 0;
 
     private boolean accountNonLocked = true;
+
+    @OneToMany(mappedBy = "user")
+    private List<AccountTransactionEntity> accountTransactionEntities;
+
 
     public String getName() {
         return name;
@@ -81,6 +93,20 @@ public class UserEntity extends BaseEntity implements Serializable{
         this.accountNonLocked = accountNonLocked;
     }
 
- 
+    public List<AccountTransactionEntity> getAccountTransactionEntities() {
+        return accountTransactionEntities;
+    }
+
+    public void setAccountTransactionEntities(List<AccountTransactionEntity> accountTransactionEntities) {
+        this.accountTransactionEntities = accountTransactionEntities;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole userRole) {
+        this.role = userRole;
+    }
     
 }

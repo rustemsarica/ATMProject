@@ -28,7 +28,18 @@ public class AccountTransactionServicesImpl implements AccountTransactionService
     private ModelMapper modelMapper;
 
     @Override
-    public List<AccountTransactionDto> getAllTransactions(Long id) {
+    public List<AccountTransactionDto> getAllTransactions() {
+        List<AccountTransactionDto> list = new ArrayList<>();
+        List<AccountTransactionEntity> entities = accountTransactionRepository.findAll();
+        
+        for(AccountTransactionEntity entity : entities){
+            list.add(entityToDto(entity));
+        }
+        return list;
+    }
+
+    @Override
+    public List<AccountTransactionDto> getUserAllTransactions(Long id) {
         List<AccountTransactionDto> list = new ArrayList<>();
         List<AccountTransactionEntity> entities = accountTransactionRepository.findByUserId(id);
         
