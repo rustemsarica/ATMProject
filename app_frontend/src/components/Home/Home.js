@@ -144,7 +144,7 @@ function Home(){
                     {transaction==2 &&
                         <TextField id="outlined-basic" label="Receiver" variant="outlined" value={receiver} onChange={(e)=>{setReceiver(e.target.value)}} />
                     }
-                    <Button disabled={amount>0 & (transaction!=2 || (receiver!="" && receiver!=null)) ? false : true } onClick={ createTransactions } variant="contained">Contained</Button>
+                    <Button disabled={amount>0 & (transaction!=2 || (receiver!="" && receiver!=null)) ? false : true } onClick={ createTransactions } variant="contained">Submit</Button>
                 </Container>
                 </div>
             }
@@ -155,7 +155,9 @@ function Home(){
                             <TableRow>
                             <TableCell align="left">
                             </TableCell>
-                            <TableCell align="left" colSpan={4}>Details</TableCell>
+                            <TableCell align="left">Amount</TableCell>
+                            <TableCell align="left">Type</TableCell>
+                            <TableCell align="right">Date</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -165,8 +167,8 @@ function Home(){
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >                                
                                 <TableCell style={{cursor:isAdmin=="true" &&"pointer"}} onClick={isAdmin=="true" ? () => {navigate("/user/"+element.user.id);} : null} align="left"> {element.user.name } </TableCell>
-                                <TableCell align="right">{element.amount}</TableCell>
-                                <TableCell align="right">{element.type}</TableCell>
+                                <TableCell align="left">{element.amount}</TableCell>
+                                <TableCell align="left">{element.type}</TableCell>
                                 <TableCell align="right">{new Date(element.createdDate).toUTCString()}</TableCell>
                             </TableRow>
                         ))}

@@ -108,7 +108,7 @@ function UserDetail(){
                                 key={i}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >                                
-                                <TableCell style={{cursor:isAdmin&&"pointer"}} onClick={isAdmin ? () => {navigate("/home");} : null} align="left"> {element.user.name } </TableCell>
+                                <TableCell align="left"> {element.user.name } </TableCell>
                                 <TableCell align="left">{element.amount}</TableCell>
                                 <TableCell align="left">{element.type}</TableCell>
                                 <TableCell align="right">{new Date(element.createdDate).toUTCString()}</TableCell>
