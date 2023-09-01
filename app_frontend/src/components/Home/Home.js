@@ -23,7 +23,7 @@ import { Card, CardContent, Typography } from "@mui/material";
 function Home(){
     const navigate = useNavigate();
 
-    const {setPageName, token, role, isAdmin, userId} = useStateContext();
+    const {setPageName, isAdmin, userId} = useStateContext();
 
     const [user, setUser] = useState(null);
 
@@ -115,7 +115,8 @@ function Home(){
         
     return (
         <Container style={{marginBottom:"80px"}}>
-            {isAdmin == "false" && user!=null &&
+            {user && isAdmin=="false" &&
+                <div>
                 <Card style={{marginBottom:"40px"}}>
                     <CardContent>                        
                         <Typography variant="h5" component="div" gutterBottom>{user.name}</Typography>
@@ -123,8 +124,7 @@ function Home(){
                         <Typography variant="h6" component="div" gutterBottom>{user.username}</Typography>
                     </CardContent>
                 </Card>
-            }
-            {isAdmin == "false" &&
+            
                 <Container style={{marginBottom:"40px"}}>
                     <TextField id="outlined-basic" label="Amount" variant="outlined" defaultValue={amount} onChange={(e)=>{setAmount(e.target.value)}} />
                     <FormControl >
@@ -146,6 +146,7 @@ function Home(){
                     }
                     <Button disabled={amount>0 & (transaction!=2 || (receiver!="" && receiver!=null)) ? false : true } onClick={ createTransactions } variant="contained">Contained</Button>
                 </Container>
+                </div>
             }
             <Paper>
                 <TableContainer>
@@ -163,7 +164,7 @@ function Home(){
                                 key={i}
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >                                
-                                <TableCell style={{cursor:isAdmin&&"pointer"}} onClick={isAdmin ? () => {navigate("/user/"+element.user.id);} : null} align="left"> {element.user.name } </TableCell>
+                                <TableCell style={{cursor:isAdmin=="true" &&"pointer"}} onClick={isAdmin=="true" ? () => {navigate("/user/"+element.user.id);} : null} align="left"> {element.user.name } </TableCell>
                                 <TableCell align="right">{element.amount}</TableCell>
                                 <TableCell align="right">{element.type}</TableCell>
                                 <TableCell align="right">{new Date(element.createdDate).toUTCString()}</TableCell>

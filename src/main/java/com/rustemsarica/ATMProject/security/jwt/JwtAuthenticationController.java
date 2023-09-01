@@ -8,6 +8,7 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,10 +18,13 @@ import com.rustemsarica.ATMProject.business.services.UserServices;
 import com.rustemsarica.ATMProject.data.entities.UserEntity;
 import com.rustemsarica.ATMProject.providers.CustomAuthenticationProvider;
 import com.rustemsarica.ATMProject.security.jwtRequests.JwtLoginRequest;
-import com.rustemsarica.ATMProject.security.jwtRequests.jwtRegisterRequest;
+import com.rustemsarica.ATMProject.security.jwtRequests.JwtRegisterRequest;
+
+import jakarta.validation.Valid;
 
 
 @RestController
+@Validated
 public class JwtAuthenticationController {
     
     @Autowired
@@ -37,18 +41,13 @@ public class JwtAuthenticationController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<?> saveUser(@RequestBody jwtRegisterRequest user) throws Exception {
-        try {
-            UserEntity userEntity = userDetailsService.save(user);
-            return ResponseEntity.ok(userEntity);
-        } catch (Exception e) {
-            return ResponseEntity.ok(e.getMessage());
-        }
-        
+    public ResponseEntity<?> saveUser(@Valid @RequestBody JwtRegisterRequest user) {
+        userDetailsService.save(user);
+        return ResponseEntity.ok("User created"); 
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtLoginRequest authenticationRequest) throws Exception {
+    public ResponseEntity<?> createAuthenticationToken(@Valid @RequestBody JwtLoginRequest authenticationRequest) throws Exception {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
        

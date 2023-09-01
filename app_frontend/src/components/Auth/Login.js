@@ -19,9 +19,13 @@ import { useStateContext } from "../../components/contexts/ContextProvider";
 import { Container } from "@mui/material";
 import axiosClient from "../../axios-client";
 import {  enqueueSnackbar } from 'notistack';
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
 
 function Login(){
     const navigate = useNavigate();
+    const [errors, setErrors] = useState(null);
+
     const {setName, setUserId, setToken, setRefreshToken, setRole, setIsAdmin, setPageName} = useStateContext();
     const [username, setUserName] = useState("");
     const [password, setPassword] = useState("");
@@ -55,7 +59,14 @@ function Login(){
             
         })
         .catch((error)=>{
-            enqueueSnackbar(error.message,{variant:"error"})
+            if (error.response) {
+                const { data } = error.response;
+                if (data.fieldErrors) {
+                  setErrors(data.fieldErrors);
+                }
+            }else{
+                enqueueSnackbar(error.message,{variant:"error"}) 
+            }
         })
     }
 
@@ -70,7 +81,14 @@ function Login(){
                 <Grid item xs={12} md={6}>                   
                     <form onSubmit={onSubmit}>
                         <Card sx={{ textAlign: 'left' }}>
-                            <CardContent>                                 
+                            <CardContent>
+                            { errors &&
+                                <Stack sx={{ width: '100%' }} spacing={2}>
+                                    {errors.map((key) => (
+                                        <Alert key={key} severity="error">{key.message}</Alert>
+                                    ))}
+                                </Stack>
+                                }                                
                                 <FormControl fullWidth sx={{ m: 1 }}>
                                     <InputLabel htmlFor="outlined-adornment-amount">Username</InputLabel>
                                     <OutlinedInput

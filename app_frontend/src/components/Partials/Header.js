@@ -4,12 +4,13 @@ import Typography from '@mui/material/Typography';
 import { useStateContext } from "../../components/contexts/ContextProvider";
 
 export default function Header() {
-    const {pageName,token, username,setName, setUserId, setToken} = useStateContext();
+    const {pageName,token, username,setName, setUserId, setToken, setIsAdmin} = useStateContext();
     
     const onLogout = () => {        
         setName(null)
         setUserId(null)
         setToken(null)
+        setIsAdmin(null)
     }
 
     return (

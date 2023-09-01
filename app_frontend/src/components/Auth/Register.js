@@ -25,6 +25,7 @@ function Register(){
     const {setPageName} = useStateContext();
     setPageName("Register");
 
+    const [name, setName] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
@@ -40,31 +41,51 @@ function Register(){
 
     const onSubmit = (ev)=>{
         ev.preventDefault()
+        setErrors(null)
 
-        axiosClient.post('/auth/register',{
+        axiosClient.post('/register',{
+            name: name,
             username: username,
             password: password,
         })
         .then(({data}) => {
-            enqueueSnackbar(data.message,{variant:data.status})
+            console.log(data)
+            enqueueSnackbar(data,{variant:"success"})
         })
-        .catch((err) => setErrors(err))
+        .catch((err) => {
+            if (err.response) {
+                const { data } = err.response;
+                if (data.fieldErrors) {
+                  setErrors(data.fieldErrors);
+                }
+            }else{
+                enqueueSnackbar(err,{variant:"error"}) 
+            }
+        })
     }
 
     return (
         <Container>
-            <Grid container direction="row" justifyContent="center" alignItems="center"> 
+            <Grid container direction="row" justifyContent="center" alignItems="center" style={{minHeight:'calc(100vh - 80px)'}}> 
                 <Grid item xs={12} md={6}>                 
                     <form onSubmit={onSubmit}>
                         <Card sx={{ textAlign: 'left' }}>
                             <CardContent> 
                                 { errors &&
                                 <Stack sx={{ width: '100%' }} spacing={2}>
-                                    {Object.keys(errors).map(key => (
-                                        <Alert key={key} severity="error">{errors[key][0]}</Alert>
+                                    {errors.map((key) => (
+                                        <Alert key={key} severity="error">{key.message}</Alert>
                                     ))}
                                 </Stack>
                                 }
+                                <FormControl fullWidth sx={{ m: 1 }}>
+                                    <InputLabel htmlFor="outlined-adornment-amount">Name</InputLabel>
+                                    <OutlinedInput
+                                        id="outlined-adornment-amount"
+                                        label="Name" 
+                                        onChange={(ev)=>setName(ev.target.value)}
+                                    />
+                                </FormControl>
                                 <FormControl fullWidth sx={{ m: 1 }}>
                                     <InputLabel htmlFor="outlined-adornment-amount">Username</InputLabel>
                                     <OutlinedInput

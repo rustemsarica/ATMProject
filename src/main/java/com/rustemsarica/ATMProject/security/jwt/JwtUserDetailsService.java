@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.rustemsarica.ATMProject.data.entities.UserEntity;
 import com.rustemsarica.ATMProject.data.repositories.UserRepository;
-import com.rustemsarica.ATMProject.security.jwtRequests.jwtRegisterRequest;
+import com.rustemsarica.ATMProject.security.jwtRequests.JwtRegisterRequest;
 
 @Service
 public class JwtUserDetailsService implements UserDetailsService{
@@ -38,10 +38,8 @@ public class JwtUserDetailsService implements UserDetailsService{
                 authorities);
     }
 
-    public UserEntity save(jwtRegisterRequest user) throws Exception{
-        if(userRepository.findByUsername(user.getUsername()).isPresent()){
-            throw new Exception("User already exist");
-        }
+    public UserEntity save(JwtRegisterRequest user) {
+        
         UserEntity newUser = new UserEntity();
         newUser.setName(user.getName());
         newUser.setUsername(user.getUsername());

@@ -66,7 +66,7 @@ function App() {
                   <Routes>
                     <Route exact path='/' element={token == null ? <Navigate to="/auth/login"/> : <Home  />}></Route>
 
-                    <Route exact path='/user/:userId' element={!isAdmin ? <Navigate to="/"/> : <UserDetail/>}></Route>
+                    <Route exact path='/user/:userId' element={token == null || isAdmin =="false" ? <Navigate to="/"/> : <UserDetail/>}></Route>
                     <Route exact path='/auth/register' element={token != null ? <Navigate to="/"/> : <Register/>}></Route>
                     <Route exact path='/auth/login' element={token != null ? <Navigate to="/"/> : <Login/>}></Route>
                     

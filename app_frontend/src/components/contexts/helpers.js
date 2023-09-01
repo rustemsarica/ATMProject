@@ -2,6 +2,9 @@ import axiosClient from "../../axios-client"
 import {  enqueueSnackbar } from 'notistack';
 
 export const unauthorizedHandler = (error) => {
+    if(!["Login", "Register"].includes(localStorage.getItem("PAGE")) ){
+        return;
+    }
     axiosClient.post("/auth/refresh",{
         userId: localStorage.getItem("USERID"),
         refreshToken: localStorage.getItem("REFRESH_TOKEN"),
