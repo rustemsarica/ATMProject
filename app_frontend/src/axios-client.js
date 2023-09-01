@@ -16,7 +16,7 @@ axiosClient.interceptors.response.use(
     (error) => {
         console.log(error)
         if(error.response.status === 401){
-            unauthorizedHandler(error);
+            // unauthorizedHandler(error);
         }
         return Promise.reject(error);
         

@@ -17,12 +17,15 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-
+import {  enqueueSnackbar } from 'notistack';
+import { Card, CardContent, Typography } from "@mui/material";
 
 function Home(){
     const navigate = useNavigate();
 
-    const {setPageName, token, role, isAdmin} = useStateContext();
+    const {setPageName, token, role, isAdmin, userId} = useStateContext();
+
+    const [user, setUser] = useState(null);
 
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -76,26 +79,53 @@ function Home(){
             ({data})=>{       
                 console.log(data);
                 getTransactions(page,rowsPerPage);
+                getUser();
             },
             (error)=>{
-                console.log(error)
+                if(error.response.data){
+                    enqueueSnackbar(error.response.data,{variant:"error"})
+                }else{
+                    enqueueSnackbar(error.message,{variant:"error"})
+                }                
+            }
+        )
+        
+    }
+
+    const getUser = () => {
+        axiosClient.get("/users/"+userId)
+        .then(
+            ({data})=>{
+                console.log(data)
+                setUser(data);
+            },
+            (error)=>{
                 setIsLoaded(true);
                 setError(error);
             }
         )
-        
     }
     
     useEffect(()=>{
         setPageName("Home");
         getTransactions(page,rowsPerPage);
+        getUser();
     },[])
 
         
     return (
         <Container style={{marginBottom:"80px"}}>
+            {isAdmin == "false" && user!=null &&
+                <Card style={{marginBottom:"40px"}}>
+                    <CardContent>                        
+                        <Typography variant="h5" component="div" gutterBottom>{user.name}</Typography>
+                        <Typography variant="h6" component="div" gutterBottom>Balance : {user.balance}</Typography>
+                        <Typography variant="h6" component="div" gutterBottom>{user.username}</Typography>
+                    </CardContent>
+                </Card>
+            }
             {isAdmin == "false" &&
-                <Container>
+                <Container style={{marginBottom:"40px"}}>
                     <TextField id="outlined-basic" label="Amount" variant="outlined" defaultValue={amount} onChange={(e)=>{setAmount(e.target.value)}} />
                     <FormControl >
                         <InputLabel id="demo-simple-select-label">Transaction</InputLabel>

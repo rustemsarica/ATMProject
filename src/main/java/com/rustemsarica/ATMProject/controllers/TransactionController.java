@@ -23,6 +23,7 @@ import com.rustemsarica.ATMProject.data.entities.AccountTransactionEntity;
 import com.rustemsarica.ATMProject.data.entities.UserEntity;
 import com.rustemsarica.ATMProject.data.entities.utils.TransactionType;
 import com.rustemsarica.ATMProject.data.repositories.UserRepository;
+import com.rustemsarica.ATMProject.exceptions.ResourceNotFoundException;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
@@ -45,13 +46,16 @@ public class TransactionController {
     {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Pageable pageable = PageRequest.of((int)page, (int)size);
-        Page<AccountTransactionEntity> response;
+        Page<AccountTransactionEntity> response = null;
 
-        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-            response = accountTransactionServices.getAllTransactions(pageable);
-        }else{
-            response = accountTransactionServices.getUserAllTransactions(pageable, userServices.getUserByUsername(auth.getName()).getId());
+        if(auth!=null){
+            if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+                response = accountTransactionServices.getAllTransactions(pageable);
+            }else{
+                response = accountTransactionServices.getUserAllTransactions(pageable, userServices.getUserByUsername(auth.getName()).getId());
+            }
         }
+        
 
         return ResponseEntity.ok(response);
     }
@@ -66,11 +70,9 @@ public class TransactionController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createTransaction(@RequestBody TransactionCreateDto transactionCreateDto) throws Exception{
+    public ResponseEntity<?> createTransaction(@RequestBody TransactionCreateDto transactionCreateDto) throws Exception, ResourceNotFoundException{
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        
         UserEntity userEntity = userServices.getUserByUsername(auth.getName());
-
         AccountTransactionDtoBuilder accountTransactionDtoBuilder = AccountTransactionDto.builder().user(userEntity).amount(transactionCreateDto.getAmount());
 
         if(transactionCreateDto.getType()==0){
@@ -78,16 +80,17 @@ public class TransactionController {
         }else if(transactionCreateDto.getType()==1){
             accountTransactionDtoBuilder.type(TransactionType.DEPOSIT);
         }else if(transactionCreateDto.getType()==2){
-            accountTransactionDtoBuilder.type(TransactionType.TRANSFER).receiver(userServices.getUserByUsername(transactionCreateDto.getReceiver())).sender(userEntity);
+            try {
+                accountTransactionDtoBuilder.type(TransactionType.TRANSFER).receiver(userServices.getUserByUsername(transactionCreateDto.getReceiver())).sender(userEntity);
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
+            
         }else{
             throw new Exception("Type error");
         }
         AccountTransactionDto accountTransactionDto = accountTransactionDtoBuilder.build();
-        
-        //  AccountTransactionDto accountTransactionDto = AccountTransactionDto.builder().user(userRepository.findById(1L).get()).amount(50F).type(TransactionType.TRANSFER).receiver(userRepository.findById(2L).get()).build(); 
-        //AccountTransactionDto accountTransactionDto = AccountTransactionDto.builder().user(userRepository.findById(1L).get()).amount(50F).type(TransactionType.DEPOSIT).build(); 
-        // AccountTransactionDto accountTransactionDto = AccountTransactionDto.builder().user(userRepository.findById(1L).get()).amount(50F).type(TransactionType.WITHDRAW).build();
-       
+
         try {
             AccountTransactionDto accountTransactionDto2 = accountTransactionServices.createTransaction(accountTransactionDto);
             return ResponseEntity.ok(accountTransactionDto2);

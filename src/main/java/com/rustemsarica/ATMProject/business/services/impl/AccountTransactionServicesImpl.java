@@ -78,8 +78,6 @@ public class AccountTransactionServicesImpl implements AccountTransactionService
     }
 
     private void withdraw(AccountTransactionDto transactionDto) throws Exception{
-        AccountTransactionEntity accountTransactionEntity = dtoToEntity(transactionDto);
-        accountTransactionRepository.save(accountTransactionEntity);
 
         UserEntity userEntity = transactionDto.getUser();
         if(userEntity.getBalance() >= transactionDto.getAmount()){
@@ -88,20 +86,22 @@ public class AccountTransactionServicesImpl implements AccountTransactionService
         }else{
             throw new Exception("Not enough balance");
         }
+        AccountTransactionEntity accountTransactionEntity = dtoToEntity(transactionDto);
+        accountTransactionRepository.save(accountTransactionEntity);
     }
 
     private void deposit(AccountTransactionDto transactionDto) throws Exception{
-        AccountTransactionEntity accountTransactionEntity = dtoToEntity(transactionDto);
-        accountTransactionRepository.save(accountTransactionEntity);
 
         UserEntity userEntity = transactionDto.getUser();
         userEntity.addBalance(transactionDto.getAmount());
         userRepository.save(userEntity);
+        AccountTransactionEntity accountTransactionEntity = dtoToEntity(transactionDto);
+        accountTransactionRepository.save(accountTransactionEntity);
     }
 
     private void transfer(AccountTransactionDto transactionDto) throws Exception{        
         
-        UserEntity userEntity = transactionDto.getUser();
+        UserEntity userEntity = transactionDto.getUser();        
         if(userEntity.getBalance() >= transactionDto.getAmount()){
             AccountTransactionDto sender = AccountTransactionDto.builder()
                                                                     .user(transactionDto.getUser())
