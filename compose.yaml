@@ -8,6 +8,11 @@ services:
       - 'MYSQL_USER=myuser'
     ports:
       - '3306'
+  react-app:
+    container_name: "react-container"
+    build: "./app_frontend"
+    ports:
+      - "3000:3000"
   phpmyadmin:
     image: 'phpmyadmin'
     environment:
