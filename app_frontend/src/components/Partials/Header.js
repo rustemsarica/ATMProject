@@ -1,10 +1,10 @@
-import { Card, CardContent } from "@mui/material";
+import { CardContent } from "@mui/material";
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { useStateContext } from "../../components/contexts/ContextProvider";
 
 export default function Header() {
-    const {pageName,token, username,setName, setUserId, setToken, setIsAdmin} = useStateContext();
+    const {token, setName, setUserId, setToken, setIsAdmin} = useStateContext();
     
     const onLogout = () => {        
         setName(null)
@@ -32,6 +32,7 @@ export default function Header() {
                     <Typography href="/" variant="h6" noWrap component="a" style={{textDecoration:"none"}}>
                     Home
                     </Typography>
+                    
                     {token!=null &&
                     <Typography component="div" variant="h6" onClick={onLogout} style={{cursor:"pointer"}}>
                         Logout

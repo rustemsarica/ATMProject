@@ -115,7 +115,7 @@ function Home(){
         
     return (
         <Container style={{marginBottom:"80px"}}>
-            {user && isAdmin=="false" &&
+            {user!=null && isAdmin=="false" &&
                 <div>
                 <Card style={{marginBottom:"40px"}}>
                     <CardContent>                        
