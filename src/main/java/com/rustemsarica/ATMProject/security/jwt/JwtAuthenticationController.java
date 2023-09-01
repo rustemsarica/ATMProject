@@ -8,11 +8,12 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rustemsarica.ATMProject.business.dto.LoginDto;
+import com.rustemsarica.ATMProject.business.services.UserServices;
 import com.rustemsarica.ATMProject.data.entities.UserEntity;
 import com.rustemsarica.ATMProject.providers.CustomAuthenticationProvider;
 import com.rustemsarica.ATMProject.security.jwtRequests.JwtLoginRequest;
@@ -20,7 +21,6 @@ import com.rustemsarica.ATMProject.security.jwtRequests.jwtRegisterRequest;
 
 
 @RestController
-@CrossOrigin
 public class JwtAuthenticationController {
     
     @Autowired
@@ -31,6 +31,9 @@ public class JwtAuthenticationController {
 
     @Autowired
     private JwtUserDetailsService userDetailsService;
+
+    @Autowired
+    private UserServices userServices;
 
 
     @PostMapping("/register")
@@ -48,10 +51,18 @@ public class JwtAuthenticationController {
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtLoginRequest authenticationRequest) throws Exception {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
-        
+       
         final String token = jwtTokenUtil.generateToken(userDetails);
-        
-        return ResponseEntity.ok(new JwtResponse(token));
+        UserEntity userEntity = userServices.getUserByUsername(authenticationRequest.getUsername());
+
+        LoginDto loginDto = new LoginDto();
+        loginDto.setId(userEntity.getId());
+        loginDto.setUsername(userEntity.getUsername());
+        loginDto.setToken("Bearer "+token);
+        loginDto.setRefreshToken("token");
+        loginDto.setRole(userEntity.getRole());
+
+        return ResponseEntity.ok(loginDto);
     }
 
 

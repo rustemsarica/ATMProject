@@ -1,10 +1,9 @@
 package com.rustemsarica.ATMProject.business.services.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -29,25 +28,18 @@ public class AccountTransactionServicesImpl implements AccountTransactionService
     private ModelMapper modelMapper;
 
     @Override
-    public List<AccountTransactionDto> getAllTransactions() {
-        List<AccountTransactionDto> list = new ArrayList<>();
-        List<AccountTransactionEntity> entities = accountTransactionRepository.findAll();
+    public Page<AccountTransactionEntity> getAllTransactions(Pageable pageable) {
         
-        for(AccountTransactionEntity entity : entities){
-            list.add(entityToDto(entity));
-        }
-        return list;
+        Page<AccountTransactionEntity> entities = accountTransactionRepository.findAllByOrderByIdDesc(pageable);        
+        
+        return entities;
     }
 
     @Override
-    public List<AccountTransactionDto> getUserAllTransactions(Long id) {
-        List<AccountTransactionDto> list = new ArrayList<>();
-        List<AccountTransactionEntity> entities = accountTransactionRepository.findByUserId(id);
+    public Page<AccountTransactionEntity> getUserAllTransactions(Pageable pageable, Long id) {
         
-        for(AccountTransactionEntity entity : entities){
-            list.add(entityToDto(entity));
-        }
-        return list;
+        Page<AccountTransactionEntity> entities = accountTransactionRepository.findAllByUserIdOrderByIdDesc(pageable,id);
+        return entities;
     }
 
     @Override
